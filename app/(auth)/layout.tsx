@@ -23,10 +23,20 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           href="/"
           className="flex items-center gap-2 self-center font-medium"
         >
-          <Image src={Logo} alt="logo" width={30} height={30} />
+          <Image src={Logo} alt="logo" width={25} height={25} />
           BrainFuel.
         </Link>
         {children}
+        <div className="text-balance text-center text-xs text-muted-foreground">
+          By clicking continue, you agree to our{" "}
+          <span className="hover:text-primary hover:underline">
+            Terms of service
+          </span>{" "}
+          and{" "}
+          <span className="hover:text-primary hover:underline">
+            Privacy Policy
+          </span>
+        </div>
       </div>
     </div>
   );
