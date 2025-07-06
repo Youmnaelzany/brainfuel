@@ -13,6 +13,7 @@ import {
 } from "@arcjet/next";
 import { toNextJsHandler } from "better-auth/next-js";
 
+import arcjet from "@/lib/arcjet";
 import { auth } from "@/lib/auth";
 
 const emailOptions = {
@@ -68,19 +69,21 @@ async function protect(req: NextRequest): Promise<ArcjetDecision> {
     // the email validation checks as well. See
     // https://www.better-auth.com/docs/concepts/hooks#example-enforce-email-domain-restriction
     if (typeof body.email === "string") {
-      return aj
+      return arcjet
         .withRule(protectSignup(signupOptions))
-        .protect(req, { email: body.email, userId });
+        .protect(req, { email: body.email, fingerprint: userId });
     } else {
       // Otherwise use rate limit and detect bot
-      return aj
+      return arcjet
         .withRule(detectBot(botOptions))
         .withRule(slidingWindow(rateLimitOptions))
-        .protect(req, { userId });
+        .protect(req, { fingerprint: userId });
     }
   } else {
     // For all other auth requests
-    return aj.withRule(detectBot(botOptions)).protect(req, { userId });
+    return arcjet
+      .withRule(detectBot(botOptions))
+      .protect(req, { fingerprint: userId });
   }
 }
 
