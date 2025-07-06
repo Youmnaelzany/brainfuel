@@ -18,7 +18,7 @@ export const auth = betterAuth({
   },
   plugins: [
     emailOTP({
-      async sendVerificationOTP({ email, otp, type }) {
+      async sendVerificationOTP({ email, otp }) {
         await resend.emails.send({
           from: "BrainFuel <onboarding@resend.dev>",
           to: [email],
@@ -28,7 +28,7 @@ export const auth = betterAuth({
             <p>To verify your email address, please use the following OTP:</p>
             <p><strong>${otp}</strong></p>
             <p>This OTP is valid for 10 minutes.</p>
-            <p>Thank you for using BrainFuel!</p>
+            <p>Thank you for using BrainFuel</p>
             <p>Best regards,</p>
             <p>The BrainFuel Team</p>
           `,
