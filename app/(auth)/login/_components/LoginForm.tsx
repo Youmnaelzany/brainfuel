@@ -1,4 +1,11 @@
 "use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+
+import { GithubIcon, Loader, Send } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,13 +16,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GithubIcon, Loader } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { useTransition } from "react";
-import { toast } from "sonner";
 
 export function LoginForm() {
+  const router = useRouter();
   const [githubPending, startGithubTransition] = useTransition();
+  const [emailPending, startEmailTransition] = useTransition();
+  const [email, setEmail] = useState("");
 
   // Function to handle GitHub sign-in
   async function signInWithGitHub() {
@@ -31,6 +38,25 @@ export function LoginForm() {
           },
           onError: (error) => {
             toast.error("Issue logging in with GitHub, please try again.");
+          },
+        },
+      });
+    });
+  }
+
+  // Function to handle email sign-in
+  async function signInWithEmail() {
+    startEmailTransition(async () => {
+      await authClient.emailOtp.sendVerificationOtp({
+        email: email,
+        type: "sign-in",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Email sent! Please check your inbox.");
+            router.push(`/verify-request`);
+          },
+          onError: () => {
+            toast.error("Issue logging in with Email, please try again.");
           },
         },
       });
@@ -56,13 +82,13 @@ export function LoginForm() {
             </>
           ) : (
             <>
-              <GithubIcon className="size-4 " />
+              <GithubIcon className="size-4" />
               Sign in with GitHub
             </>
           )}
         </Button>
-        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-          <span className="relative px-2 bg-card z-10 text-muted-foreground">
+        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+          <span className="bg-card text-muted-foreground relative z-10 px-2">
             Or continue with
           </span>
         </div>
@@ -70,9 +96,27 @@ export function LoginForm() {
         <div className="grid gap-3">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input type="email" placeholder="m@example.com" />
+            <Input
+              type="email"
+              placeholder="m@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-          <Button>Continue with email</Button>
+          <Button onClick={signInWithEmail} disabled={emailPending}>
+            {emailPending ? (
+              <>
+                <Loader className="size-4 animate-spin" />
+                <span className="">Loading...</span>
+              </>
+            ) : (
+              <>
+                <Send className="size-4" />
+                <span className="">Continue with email</span>
+              </>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
