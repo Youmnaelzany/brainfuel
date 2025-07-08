@@ -26,12 +26,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSignOut } from "@/hooks/use-signout";
 import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
-
+  const handleSignout = useSignOut();
   if (isPending) {
     return null;
   }
@@ -128,7 +129,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

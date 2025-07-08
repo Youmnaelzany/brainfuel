@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import {
   BookOpen,
@@ -10,7 +9,6 @@ import {
   LayoutDashboardIcon,
   LogOutIcon,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { useSignOut } from "@/hooks/use-signout";
 
 interface iAppProps {
   name: string;
@@ -32,21 +30,7 @@ interface iAppProps {
 }
 
 export function UserDropdownMenu({ name, email, image }: iAppProps) {
-  const router = useRouter();
-
-  async function signOut() {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/"); // redirect to login page
-          toast.success("Successfully logged out!");
-        },
-        onError: () => {
-          toast.error("Failed to signed out!");
-        },
-      },
-    });
-  }
+  const handleSignout = useSignOut();
 
   return (
     <DropdownMenu>
@@ -98,7 +82,7 @@ export function UserDropdownMenu({ name, email, image }: iAppProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signOut}>
+        <DropdownMenuItem onClick={handleSignout}>
           <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
           <span>Logout</span>
         </DropdownMenuItem>
