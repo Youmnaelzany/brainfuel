@@ -124,7 +124,7 @@ export function NavUser() {
               <DropdownMenuItem asChild>
                 <Link href={"/admin/courses"}>
                   <Tv2 />
-                  Notifications
+                  Courses
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
