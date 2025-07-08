@@ -109,16 +109,22 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <IconHome />
-                <Link href={"/"}>Home</Link>
+                <Link href={"/"}>
+                  <IconHome />
+                  Home
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <IconDashboard />
-                <Link href={"/admin"}>Dashboard</Link>
+                <Link href={"/admin"}>
+                  <IconDashboard />
+                  Dashboard
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Tv2 />
-                <Link href={"/admin/courses"}>Notifications</Link>
+                <Link href={"/admin/courses"}>
+                  <Tv2 />
+                  Notifications
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

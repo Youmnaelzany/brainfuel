@@ -25,7 +25,7 @@ const navigationItems: NavigationItem[] = [
   },
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/admin",
   },
 ];
 
