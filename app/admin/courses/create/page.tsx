@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SparkleIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import slugify from "slugify";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,6 +15,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { CourseSchemaType, courseSchema } from "@/lib/zodSchemas";
 
 export default function CourseCreation() {
@@ -30,6 +43,13 @@ export default function CourseCreation() {
       smallDescription: "",
     },
   });
+
+  // 2. Define a submit handler.
+  function onSubmit(values: CourseSchemaType) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    console.log(values);
+  }
   return (
     <>
       <div className="flex items-center gap-4">
@@ -48,7 +68,102 @@ export default function CourseCreation() {
           <CardDescription>
             Provide basic information about the course
           </CardDescription>
-          <CardContent></CardContent>
+          <CardContent>
+            <Form {...form}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex items-end gap-4">
+                  <FormField
+                    control={form.control}
+                    name="slug"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Slug</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Slug" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    className="w-fit"
+                    onClick={() => {
+                      const titleValue = form.getValues("title");
+                      const slug = slugify(titleValue);
+                      form.setValue("slug", slug, { shouldValidate: true });
+                    }}
+                  >
+                    Generate Slug <SparkleIcon className="ml-1 size-4" />
+                  </Button>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="smallDescription"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Small Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Small Description"
+                          {...field}
+                          className="min-h-[120px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel> Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder=" Description"
+                          {...field}
+                          className="min-h-[120px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fileKey"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Thumbnail Image</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Thumbnail URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
         </CardHeader>
       </Card>
     </>
