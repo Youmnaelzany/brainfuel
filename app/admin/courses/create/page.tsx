@@ -157,7 +157,7 @@ export default function CourseCreation() {
                     <FormItem className="w-full">
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <RichTextEditor />
+                        <RichTextEditor field={field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
