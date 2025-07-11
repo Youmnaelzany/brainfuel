@@ -7,7 +7,7 @@ import { ArrowLeft, PlusIcon, SparkleIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 
-import { RichTextEditor } from "@/components/rich-text-editor/editor";
+import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -158,11 +158,6 @@ export default function CourseCreation() {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <RichTextEditor />
-                        {/* <Textarea
-                          placeholder=" Description"
-                          {...field}
-                          className="min-h-[120px]"
-                        /> */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>

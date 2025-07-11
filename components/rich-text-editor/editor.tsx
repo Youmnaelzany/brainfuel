@@ -12,7 +12,7 @@ export function RichTextEditor() {
 
   return (
     <div className="">
-      <Menubar />
+      <Menubar editor={editor} />
     </div>
   );
 }
