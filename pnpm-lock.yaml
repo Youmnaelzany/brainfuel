@@ -89,6 +89,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tiptap/extension-text-align':
+        specifier: ^2.26.0
+        version: 2.26.0(@tiptap/core@2.26.0(@tiptap/pm@2.26.0))
       '@tiptap/pm':
         specifier: ^2.26.0
         version: 2.26.0
@@ -1488,6 +1491,11 @@ packages:
 
   '@tiptap/extension-strike@2.26.0':
     resolution: {integrity: sha512-x1kJj0YaApqQUKlOInqsiUsVHnhndRLsOMsIgwlgOM1wqsNDmYzNrZV2MvNYyrd4FYXdXZABYMd/EF0U/bVSPQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+
+  '@tiptap/extension-text-align@2.26.0':
+    resolution: {integrity: sha512-pi85INI+QPWZ229FdjwBxb24pUixXsNs5UVBXPFP/6xyZ/Uz6x9vKq45WMNC/2Nr8JzneiJGs66j71OSoI/lcg==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
 
@@ -4642,6 +4650,10 @@ snapshots:
       '@tiptap/core': 2.26.0(@tiptap/pm@2.26.0)
 
   '@tiptap/extension-strike@2.26.0(@tiptap/core@2.26.0(@tiptap/pm@2.26.0))':
+    dependencies:
+      '@tiptap/core': 2.26.0(@tiptap/pm@2.26.0)
+
+  '@tiptap/extension-text-align@2.26.0(@tiptap/core@2.26.0(@tiptap/pm@2.26.0))':
     dependencies:
       '@tiptap/core': 2.26.0(@tiptap/pm@2.26.0)
 
