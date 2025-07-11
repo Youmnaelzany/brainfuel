@@ -11,7 +11,10 @@ import {
   Italic,
   ListIcon,
   ListOrderedIcon,
+  RedoIcon,
   Strikethrough,
+  UndoIcon,
+  ZapIcon,
 } from "lucide-react";
 
 import {
@@ -21,6 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+import { Button } from "../ui/button";
 import { Toggle } from "../ui/toggle";
 import { TooltipProvider } from "../ui/tooltip";
 
@@ -33,7 +37,7 @@ export function Menubar({ editor }: iAppProps) {
     return null;
   }
   return (
-    <div className="border-input bg-card flex flex-wrap items-center gap-1 rounded-t-lg border p-2">
+    <div className="border-input bg-card flex flex-wrap items-center gap-1 rounded-t-lg border-x-0 border-t-0 p-2">
       <TooltipProvider>
         {/* Customize Text */}
         <div className="flex flex-wrap gap-1">
@@ -289,6 +293,60 @@ export function Menubar({ editor }: iAppProps) {
             </TooltipTrigger>
             <TooltipContent>
               <p>TextAlign Justify</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        {/* Border Separator */}
+        <div className="bg-border mx-2 h-6 w-px"></div>
+        <div className="flex flex-wrap gap-1">
+          {/* Undo Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                type="button"
+                variant={"ghost"}
+                onClick={() => editor.chain().focus().undo().run()}
+                disabled={!editor.can().undo()}
+              >
+                <UndoIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Undo</p>
+            </TooltipContent>
+          </Tooltip>
+          {/* Redo Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                type="button"
+                variant={"ghost"}
+                onClick={() => editor.chain().focus().redo().run()}
+                disabled={!editor.can().redo()}
+              >
+                <RedoIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Redo</p>
+            </TooltipContent>
+          </Tooltip>
+          {/* Emoji Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                type="button"
+                variant={"ghost"}
+                onClick={() => editor.chain().focus().setEmoji("zap").run()}
+              >
+                <ZapIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Emoji</p>
             </TooltipContent>
           </Tooltip>
         </div>
