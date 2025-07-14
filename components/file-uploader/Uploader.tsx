@@ -73,10 +73,10 @@ export default function Uploader() {
           event: ProgressEvent<EventTarget>
         ) {
           if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
+            const percentageCompleted = (event.loaded / event.total) * 100;
             setFileState((prev: any) => ({
               ...prev,
-              progress: percent,
+              progress: Math.round(percentageCompleted),
             }));
           }
         };
@@ -91,22 +91,10 @@ export default function Uploader() {
             toast.success("File uploaded successfully");
             resolve();
           } else {
-            toast.error("Upload failed");
-            setFileState((prev: any) => ({
-              ...prev,
-              uploading: false,
-              error: true,
-            }));
             reject(new Error("Upload failed"));
           }
         };
         xhr.onerror = () => {
-          toast.error("Upload error");
-          setFileState((prev: any) => ({
-            ...prev,
-            uploading: false,
-            error: true,
-          }));
           reject(new Error("Upload error"));
         };
         xhr.open("PUT", presignedUrl);
