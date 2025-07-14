@@ -1,3 +1,6 @@
+import "server-only";
+
+
 import arcjet, {
   detectBot,
   fixedWindow,
@@ -15,7 +18,7 @@ export {
   protectSignup,
   sensitiveInfo,
   shield,
-  slidingWindow,
+  slidingWindow
 };
 
 export default arcjet({

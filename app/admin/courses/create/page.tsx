@@ -7,6 +7,7 @@ import { ArrowLeft, PlusIcon, SparkleIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 
+import Uploader from "@/components/file-uploader/Uploader";
 import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -171,7 +172,7 @@ export default function CourseCreation() {
                     <FormItem className="w-full">
                       <FormLabel>Thumbnail Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="Thumbnail URL" {...field} />
+                        <Uploader />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
