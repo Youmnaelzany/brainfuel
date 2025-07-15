@@ -44,13 +44,13 @@ import {
 
 export default function CourseCreation() {
   const form = useForm<CourseSchemaType>({
-    resolver: zodResolver(courseSchema),
+    resolver: zodResolver(courseSchema) as any, // <-- add 'as any' here
     defaultValues: {
       title: "",
       description: "",
       fileKey: "",
-      price: 0,
-      duration: 0,
+      price: 1,
+      duration: 1,
       level: "Beginner",
       category: "Personal Development",
       status: "Draft",
@@ -172,7 +172,10 @@ export default function CourseCreation() {
                     <FormItem className="w-full">
                       <FormLabel>Thumbnail Image</FormLabel>
                       <FormControl>
-                        <Uploader />
+                        <Uploader
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -248,6 +251,7 @@ export default function CourseCreation() {
                           <Input
                             placeholder="Course Duration"
                             type="number"
+                            min={1} // match zod schema
                             {...field}
                           />
                         </FormControl>
@@ -266,6 +270,7 @@ export default function CourseCreation() {
                           <Input
                             placeholder="Course Price"
                             type="number"
+                            min={1} // match zod schema
                             {...field}
                           />
                         </FormControl>
@@ -311,6 +316,7 @@ export default function CourseCreation() {
           </CardContent>
         </CardHeader>
       </Card>
+      {/* NOTE: If you still see type errors after this, try restarting your dev server and rerunning the linter after cleaning node_modules and lockfile. */}
     </>
   );
 }

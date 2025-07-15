@@ -10,7 +10,12 @@ import { cn } from "@/lib/utils";
 
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
-import { RenderEmptyState, RenderErrorState } from "./RenderState";
+import {
+  RenderEmptyState,
+  RenderErrorState,
+  RenderUploadedState,
+  RenderUploadingState,
+} from "./RenderState";
 
 type UploaderState = {
   error: boolean;
@@ -24,7 +29,12 @@ type UploaderState = {
   key?: string; // Added key to state
 };
 
-export default function Uploader() {
+interface IAppProps {
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export default function Uploader({ onChange, value }: IAppProps) {
   const [fileState, setFileState] = useState<UploaderState>({
     error: false,
     file: null,
@@ -33,10 +43,11 @@ export default function Uploader() {
     progress: 0,
     isDeleting: false,
     fileType: "image",
+    key: value,
   });
 
   async function UploadFile(file: File) {
-    setFileState((prev: any) => ({
+    setFileState((prev: UploaderState) => ({
       ...prev,
       uploading: true,
       progress: 0,
@@ -57,7 +68,7 @@ export default function Uploader() {
 
       if (!presignedResponse.ok) {
         toast.error("Failed to get presigned URL");
-        setFileState((prev: any) => ({
+        setFileState((prev: UploaderState) => ({
           ...prev,
           uploading: false,
           progress: 0,
@@ -74,7 +85,7 @@ export default function Uploader() {
         ) {
           if (event.lengthComputable) {
             const percentageCompleted = (event.loaded / event.total) * 100;
-            setFileState((prev: any) => ({
+            setFileState((prev: UploaderState) => ({
               ...prev,
               progress: Math.round(percentageCompleted),
             }));
@@ -82,12 +93,13 @@ export default function Uploader() {
         };
         xhr.onload = () => {
           if (xhr.status === 200 || xhr.status === 204) {
-            setFileState((prev: any) => ({
+            setFileState((prev: UploaderState) => ({
               ...prev,
               progress: 100,
               uploading: false,
               key: key,
             }));
+            onChange?.(key);
             toast.success("File uploaded successfully");
             resolve();
           } else {
@@ -103,7 +115,7 @@ export default function Uploader() {
       });
     } catch {
       toast.error("Something went wrong");
-      setFileState((prev: any) => ({
+      setFileState((prev: UploaderState) => ({
         ...prev,
         progress: 0,
         error: true,
@@ -112,24 +124,81 @@ export default function Uploader() {
     }
   }
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      // Changed from > 1 to > 0
-      const file = acceptedFiles[0];
-      setFileState((prev) => ({
+  const UploadFileCallback = useCallback(UploadFile, []);
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+          URL.revokeObjectURL(fileState.objectUrl);
+        }
+        setFileState((prev) => ({
+          ...prev,
+          file: file,
+          uploading: false,
+          progress: 0,
+          objectUrl: URL.createObjectURL(file),
+          error: false,
+          id: uuidv4(),
+          isDeleting: false,
+          fileType: "image", // TODO: Make this dynamic if supporting more file types in the future
+        }));
+        UploadFileCallback(file);
+      }
+    },
+    [fileState.objectUrl, UploadFileCallback]
+  );
+
+  async function handleRemoveFile() {
+    if (fileState.isDeleting || !fileState.objectUrl) return;
+    try {
+      setFileState((prev: UploaderState) => ({
         ...prev,
-        file: file,
+        isDeleting: true,
+      }));
+      const response = await fetch("/api/s3/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: fileState.key,
+        }),
+      });
+      if (!response.ok) {
+        toast.error("Failed to remove file from storage");
+        setFileState((prev: UploaderState) => ({
+          ...prev,
+          isDeleting: false, // Set to false on error
+          error: true,
+        }));
+        return;
+      }
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+
+      onChange?.("");
+      setFileState((prev: UploaderState) => ({
+        file: null,
         uploading: false,
         progress: 0,
-        objectUrl: URL.createObjectURL(file),
+        objectUrl: undefined,
         error: false,
-        id: uuidv4(),
-        isDeleting: false,
         fileType: "image",
+        id: null,
+        isDeleting: false,
       }));
-      UploadFile(file);
+
+      toast.success("File removed successfully");
+    } catch {
+      toast.error("Error removing file, please try again");
+      setFileState((prev: UploaderState) => ({
+        ...prev,
+        isDeleting: false, // Set to false on error
+        error: true,
+      }));
     }
-  }, []);
+  }
 
   function rejectedFiles(fileRejection: FileRejection[]) {
     if (fileRejection.length) {
@@ -153,16 +222,36 @@ export default function Uploader() {
 
   function renderContent() {
     if (fileState.uploading) {
-      return <h1>Uploading ...</h1>;
+      return (
+        <RenderUploadingState
+          file={fileState.file as File}
+          progress={fileState.progress}
+        />
+      );
     }
     if (fileState.error) {
       return <RenderErrorState />;
     }
     if (fileState.objectUrl) {
-      return <h1>uploaded file</h1>;
+      return (
+        <RenderUploadedState
+          previewUrl={fileState.objectUrl}
+          handleRemoveFile={handleRemoveFile}
+          isDeleting={fileState.isDeleting}
+        />
+      );
     }
     return <RenderEmptyState isDragActive={isDragActive} />;
   }
+
+  // Revoke object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+    };
+  }, [fileState.objectUrl]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -173,16 +262,8 @@ export default function Uploader() {
     multiple: false,
     maxSize: 5 * 1024 * 1024, // 5mb calculation
     onDropRejected: rejectedFiles,
+    disabled: fileState.uploading || !!fileState.objectUrl,
   });
-
-  // Revoke object URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (fileState.objectUrl) {
-        URL.revokeObjectURL(fileState.objectUrl);
-      }
-    };
-  }, [fileState.objectUrl]);
 
   return (
     <Card
