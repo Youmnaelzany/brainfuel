@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -6,6 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import z from "zod";
 
 import { S3 } from "@/lib/S3Client";
+import arcjet, { detectBot, fixedWindow } from "@/lib/arcjet";
+import { auth } from "@/lib/auth";
 import { env } from "@/lib/env";
 
 export const fileUploadSchema = z.object({
@@ -15,8 +18,33 @@ export const fileUploadSchema = z.object({
   isImage: z.boolean(),
 });
 
+const aj = arcjet
+  .withRule(
+    detectBot({
+      mode: "LIVE",
+      allow: [],
+    })
+  )
+  .withRule(
+    fixedWindow({
+      mode: "LIVE",
+      window: "1m",
+      max: 5,
+    })
+  );
+
 export async function POST(request: Request) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   try {
+    const decision = await aj.protect(request, {
+      fingerprint: session?.user.id as string,
+    });
+
+    if (decision.isDenied()) {
+      return NextResponse.json({ error: "dudde not goo" }, { status: 429 });
+    }
     const body = await request.json();
     const validation = fileUploadSchema.safeParse(body);
     if (!validation.success) {
