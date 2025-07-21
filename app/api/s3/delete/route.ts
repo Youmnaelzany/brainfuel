@@ -32,7 +32,10 @@ export async function DELETE(request: Request) {
       fingerprint: session?.user.id as string,
     });
     if (decision.isDenied()) {
-      return NextResponse.json({ error: "dudde not goo" }, { status: 429 });
+      return NextResponse.json(
+        { error: "man don't do that it's not good" },
+        { status: 429 }
+      );
     }
 
     const body = await request.json();
