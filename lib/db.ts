@@ -1,6 +1,3 @@
-import "server-only";
-
-// import { global } from "better-auth/client/plugins";
 import { PrismaClient } from "./generated/prisma";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };

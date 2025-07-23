@@ -1,8 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
-
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/app/data/admin/require-admin";
 import { prisma } from "@/lib/db";
 import { ApiResponse } from "@/lib/types";
 import { CourseSchemaType, courseSchema } from "@/lib/zodSchemas";
@@ -10,10 +8,8 @@ import { CourseSchemaType, courseSchema } from "@/lib/zodSchemas";
 export async function CreateCourse(
   values: CourseSchemaType
 ): Promise<ApiResponse> {
+  const session = await requireAdmin();
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
     const validation = courseSchema.safeParse(values);
     if (!validation.success) {
       return {
